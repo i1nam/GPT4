@@ -3,7 +3,7 @@ const { Hercai } = require('hercai');
 const Monitor = require('ping-monitor');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 
 const client = new Hercai();
 
