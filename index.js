@@ -1,27 +1,66 @@
 const express = require('express');
-const axios = require('axios');
+const bodyParser = require('body-parser');
+const axios = require("axios");
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
+const cacheDir = path.join(__dirname, 'cache');
 
-app.get('/om', (req, res) => {
-    const url = 'https://azoramoon.com';
+if (!fs.existsSync(cacheDir)) {
+    fs.mkdirSync(cacheDir);
+}
 
-    request(url, (error, response, html) => {
-        if (!error && response.statusCode == 200) {
-            const $ = cheerio.load(html);
-            const images = [];
-            $('img').each((index, element) => {
-                const src = $(element).attr('src');
-                images.push(src);
-            });
-            res.json(images);
-        } else {
-            res.status(500).json({ error: 'Failed to fetch images' });
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/api/caera/sim', async (req, res) => {
+    try {
+        const link = req.query.text;
+
+        if (!link) {
+           return res.json({
+            rpl: "اكتب شي"
+        })
+            
         }
-    });
+
+
+const res = await axios.post('https://simsimi.vn/web/simtalk', {
+  text: link,
+  lc: 'ar'
+}, {
+  headers: {
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+    'Sec-Ch-Ua-Mobile': '?0',
+    'Sec-Ch-Ua-Platform': '"Windows"',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin',
+    'X-Requested-With': 'XMLHttpRequest',
+    'Referer': 'https://simsimi.vn/',
+    'Referrer-Policy': 'strict-origin-when-cross-origin'
+  }
+})
+
+    
+    const rd = res.data.success;
+      
+        res.json({
+            rpl: rd
+        })
+        
+    } catch (error) {
+        
+        res.json({
+            rpl: "✖️ | حصل خطأ"
+        })
+    }
 });
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
 });
