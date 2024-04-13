@@ -26,7 +26,7 @@ app.get('/api/caera/sim', async (req, res) => {
         }
 
 
-const res = await axios.post('https://simsimi.vn/web/simtalk', {
+const resp = await axios.post('https://simsimi.vn/web/simtalk', {
   text: link,
   lc: 'ar'
 }, {
@@ -47,7 +47,7 @@ const res = await axios.post('https://simsimi.vn/web/simtalk', {
 })
 
     
-    const rd = res.data.success;
+    const rd = resp.data.success;
       
         res.json({
             rpl: rd
